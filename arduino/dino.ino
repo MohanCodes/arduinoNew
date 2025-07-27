@@ -10,7 +10,7 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 const int JUMP_BUTTON = A2;
-
+const int BUZZ = 3;
 const unsigned char DINO_BITMAP[] PROGMEM = {
   0b000011110,
   0b000111111,
@@ -63,6 +63,8 @@ void loop() {
   if (analogRead(JUMP_BUTTON) < 100 && !isJumping) {
     isJumping = true;
     jumpPhase = 0;
+    //Por cada salto suena
+    playTone(523, 30);
   }
 
   updateGame();
@@ -71,6 +73,11 @@ void loop() {
   display.display();
   delay(50);  // Control game speed
   score++;
+  //Cada 100 puntos suena un sonido
+  if (score%100==0 and score!=0){
+      playTone(1046,50);
+      playTone(1567,200);
+    }
 }
 
 void updateGame() {
@@ -105,6 +112,12 @@ void updateGame() {
   }
 }
 
+//Sonido del buzzer
+void playTone(int f, int d) {
+  tone(BUZZ, f, d);
+  delay(d);
+  noTone(BUZZ);
+}
 void drawGame() {
   display.clearDisplay();
 
@@ -142,6 +155,10 @@ void displayIntro() {
 void gameOver() {
   display.clearDisplay();
   display.setCursor(10, 10);
+  //Sonido al perder
+  playTone(130,100);
+  delay(50);
+  playTone(130,100);
   display.print("Game Over");
   display.setCursor(10, 20);
   display.print("Score: ");
